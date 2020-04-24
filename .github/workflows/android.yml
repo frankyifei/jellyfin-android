@@ -1,0 +1,33 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Set Tag Variable'
+        run: echo "##vso[task.setvariable variable=TAG]$(git describe --tags)"
+     
+      - name: 'Install Node'
+        uses: actions/setup-node@v1.4.2
+        with:
+          node-version: 12.x
+      
+      - name: 'Install Dependencies'
+        run: yarn install --frozen-lockfile
+      
+      - name: 'Prepare Cordova'
+        run: npx cordova prepare
+      
+      - name: 'Build Debug'
+        if: eq(variables['BuildConfiguration'], 'debug')
+        run: npx cordova build android --debug
+      
+      
